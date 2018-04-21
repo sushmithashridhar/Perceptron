@@ -16,25 +16,41 @@ testdata = np.array(pd.read_csv(file2), dtype = float)
 #print(pd.DataFrame(result))
 
 inputdata[:,1:] /= 255;
+testdata[:,1:] /= 255;
 
 #print result[:,0]
 
-Target = inputdata[:, :1]
+Target_input = inputdata[:, :1]
+Target_test = testdata[:, :1]
 
-print "Target split"
-print Target.shape
+print "Target_input split"
+print Target_input.shape
+
+print "Target_test split"
+print Target_test.shape
+
 
 inputdata = inputdata[:, 1:]
+testdata = testdata[:, 1:]
  
 print "inputdata split"
 print inputdata.shape
 
+print "testdata split"
+print testdata.shape
+
 one = np.ones((59999,1))
 
+one1 = np.ones((9999,1))
+
 inputvalue = np.hstack((one,inputdata))
+testvalue = np.hstack((one1,testdata))
 
 print "Inputdata with 1"
 print inputvalue.shape
+
+print "Testdata with 1"
+print testvalue.shape
 
 #print(pd.DataFrame(result))
 #print result
@@ -54,13 +70,29 @@ print y.shape
 
 
 def Maxofdotproduct(inputvalue):
-	y = np.dot(inputvalue,weights)
+	y = np.dot(inputvalue[0],weights)
+	print "y"
+	print y.shape
 	return np.argmax(y)
 
 def accuracy(inputvalue):
-	for i in range(0,59999):
+
+	trainingConfusionMatrix = np.zeros((10,10))
+	testConfusionMatrix = np.zeros((10,10))
+
+	for i in range(0,1):
 		index = Maxofdotproduct(inputvalue)
+		print "For Train"
 		print index
+		trainingConfusionMatrix[inputvalue[i][0]][index] += 1
+
+
+	for i in range(0,1):
+		index = Maxofdotproduct(testvalue)
+		print "For Test"
+		print index
+		testingConfusionMatrix[testvalue[i][0]][index] += 1
+
 
 accuracy(inputvalue)
 #print y
