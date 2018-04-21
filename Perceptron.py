@@ -31,33 +31,38 @@ print inputdata.shape
 
 one = np.ones((59999,1))
 
-value = np.hstack((one,inputdata))
+inputvalue = np.hstack((one,inputdata))
 
 print "Inputdata with 1"
-print value.shape
-
+print inputvalue.shape
 
 #print(pd.DataFrame(result))
-
 #print result
-
-
-
-
-
-
 #weights = np.array(np.random.uniform(-0.05, 0.05, result.shape[10][1])
 
-weights = np.random.uniform(low=-0.05, high=0.05, size=(784,10) )
+weights = np.random.uniform(low=-0.05, high=0.05, size=(785,10) )
 
 
 print "Weights" 
 print weights.shape
 
-#y = np.dot(target,weights)
 
-#print y.shape
+y = np.dot(inputvalue,weights)
 
+print "Dot product of input and weight"
+print y.shape
+
+
+def Maxofdotproduct(inputvalue):
+	y = np.dot(inputvalue,weights)
+	return np.argmax(y)
+
+def accuracy(inputvalue):
+	for i in range(0,59999):
+		index = Maxofdotproduct(inputvalue)
+		print index
+
+accuracy(inputvalue)
 #print y
 
 #a = np.sum(y)
