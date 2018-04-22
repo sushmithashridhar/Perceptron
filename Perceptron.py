@@ -1,122 +1,104 @@
-import matplotlib.pyplot as plt
-import pandas as pd 
 import numpy as np
- 
-file1 = r'mnist_train.csv'
-file2 = r'mnist_test.csv'
-
-#df = pd.read_csv(file)
-#print(pd.DataFrame(df))
+import pandas as pd
+import gzip
+from sklearn.metrics import confusion_matrix
 
 
-inputdata = np.array(pd.read_csv(file1), dtype = float)
+f = gzip.open("train-images-idx3-ubyte.gz", 'rb')
+train_images = np.frombuffer(f.read(), np.uint8, offset=16)
+train_images = train_images.reshape(-1, 1, 28, 28)
+train_images = train_images.reshape(train_images.shape[0],784)
 
-testdata = np.array(pd.read_csv(file2), dtype = float)
-
-#print(pd.DataFrame(result))
-
-inputdata[:,1:] /= 255;
-testdata[:,1:] /= 255;
-
-#print result[:,0]
-
-Target_input = inputdata[:, :1]
-Target_test = testdata[:, :1]
-
-print "Target_input split"
-print Target_input.shape
-
-print "Target_test split"
-print Target_test.shape
+bias_col = np.ones((60000,1))
 
 
-inputdata = inputdata[:, 1:]
-testdata = testdata[:, 1:]
- 
-print "inputdata split"
-print inputdata.shape
 
-print "testdata split"
-print testdata.shape
+f = gzip.open("train-labels-idx1-ubyte.gz", 'rb')
+train_labels = np.frombuffer(f.read(), np.uint8, offset=8)
+train_labels = train_labels.reshape(60000,1)
 
-one = np.ones((59999,1))
+print train_labels.shape
 
-one1 = np.ones((9999,1))
-
-inputvalue = np.hstack((one,inputdata))
-testvalue = np.hstack((one1,testdata))
-
-print "Inputdata with 1"
-print inputvalue.shape
-
-print "Testdata with 1"
-print testvalue.shape
-
-#print(pd.DataFrame(result))
-#print result
-#weights = np.array(np.random.uniform(-0.05, 0.05, result.shape[10][1])
-
-weights = np.random.uniform(low=-0.05, high=0.05, size=(785,10) )
+train_labels_final = np.zeros((60000,10))
 
 
-print "Weights" 
-print weights.shape
+#convert lables with index 1
+for row in range(len(train_images)):
+	index = train_labels[row].astype(int)
+	train_labels_final[row][index-1] += 1
+
+train_labels_final.astype(int)
+
+print train_labels_final.shape
+
+train_images_matrix = np.copy(train_images)
+train_images_matrix[:,:] /= 255
+bias_col = np.ones((60000,1))
+train_images_matrix = np.append(train_images_matrix, bias_col,axis = 1)
 
 
-y = np.dot(inputvalue,weights)
+train_images_matrix.astype(int)
 
-print "Dot product of input and weight"
-print y.shape
-
-
-def Maxofdotproduct(inputvalue):
-	y = np.dot(inputvalue[0],weights)
-	print "y"
-	print y.shape
-	return np.argmax(y)
-
-def accuracy(inputvalue):
-
-	trainingConfusionMatrix = np.zeros((10,10))
-	testConfusionMatrix = np.zeros((10,10))
-
-	for i in range(0,1):
-		index = Maxofdotproduct(inputvalue)
-		print "For Train"
-		print index
-		trainingConfusionMatrix[inputvalue[i][0]][index] += 1
+#print train_images_matrix
 
 
-	for i in range(0,1):
-		index = Maxofdotproduct(testvalue)
-		print "For Test"
-		print index
-		testingConfusionMatrix[testvalue[i][0]][index] += 1
+confusion_matrix = np.zeros((10,10))
+
+weights = np.random.uniform(-0.05, 0.05, size=(785,10))
+
+#print weights.round(2)
+
+z_final = np.zeros((60000,10))
+
+for row in range(len(train_images_matrix)):
+	y = np.dot(train_images_matrix[row,:],weights).reshape(1,10)
+	#print y
+	y_final = (y == y.max(axis = 1, keepdims = 1)).astype(int)
+
+	z_final = np.append(z_final , y_final, axis = 0)
+
+	print z_final
+
+	#b = confusion_matrix(train_labels_final[row,:],y_final)
+	#diagonal_sum =  sum(np.diag(b))
+	#accuracy = (diagonal_sum/60000)*100
+	#print accuracy
+
+	sub_matrix = train_labels_final[row] - y_final 
+
+	#print sub_matrix.astype(int)
+
+	if (sub_matrix.any(axis=1)):
+		weights = weights.transpose()
+		weights += 0.001 * sub_matrix.reshape(10,1) * train_images_matrix[row]
+		#print "weights changing" 	
+		weights = weights.transpose()
 
 
-accuracy(inputvalue)
-#print y
+#print "weights changed" 
+#print weights.round(2)
+#b = confusion_matrix(train_labels_final,y_final)
+print z_final.shape
+#print confusion_matrix
 
-#a = np.sum(y)
-
-#print a
-
-#result = 1*np.andom.uniform(-0.05, 0.05)
-
-#weights_transpose = weights.transpose()
-
-#y = np.dot(result[:,0],weights)
-
-#a = result[0,:]
-
-#print a.shape
+#diagonal_sum =  sum(np.diag(b))
 #
-#print y
-#
-#print y.shape
+#accuracy = (diagonal_sum/60000)*100
+#print accuracy
+#print column_id
 
-#print weights
-#print value
 
-#print result[0]
-#print value.shape
+
+
+'''
+test_labels_final = np.zeros((10000,10))
+
+
+for row in range(len(test_labels_final)):
+	index = test_labels[row].astype(int)
+	test_labels_final[index] += 1
+
+
+print test_labels
+print test_labels_final
+'''
