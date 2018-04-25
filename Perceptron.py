@@ -136,7 +136,7 @@ for i in range(70):
     #print accuracy_test[i]
 
     
-
+########################################################### PLOTS ##########################################################
 plt.plot(accuracy_train)
 plt.plot(accuracy_test)
 plt.ylabel("Accuracy in %")
