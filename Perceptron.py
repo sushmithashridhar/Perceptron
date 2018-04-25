@@ -19,8 +19,6 @@ f = gzip.open("t10k-labels-idx1-ubyte.gz", 'rb')
 test_labels = np.frombuffer(f.read(), np.uint8, offset=8)
 test_labels = test_labels.reshape(10000,1)
 
-
-
 test_predicted = test_labels.transpose().astype(int).reshape(10000,)
 
 #convert lables with index 1
@@ -114,7 +112,7 @@ for i in range(70):
     accuracy_train[i] = (diagonal_sum_train/60000.00)*100
     #print accuracy_train[i]
 
-####Test###
+############################################################ Test ######################################################
 
     for row in range(len(test_images_matrix)):
         y_final = np.zeros([1,10],dtype=int)
