@@ -1,3 +1,6 @@
+# SUSHMITHA SHRIDHAR
+# MACHINE LEARNING HW#1
+
 import numpy as np
 import pandas as pd
 import gzip
